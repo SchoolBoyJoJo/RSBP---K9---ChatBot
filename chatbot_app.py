@@ -77,6 +77,7 @@ def chat(id):
         chat_dictionary[id] = {"history": []}
     client_history = chat_dictionary.get(id)["history"]
     response = model.get_response(user_input)
+    user_input = f"You are a mental health specialist, you only answer questions about mental health and stress management. {user_input}"
     if response == "":
         print("Using Gen AI")
         response = (
