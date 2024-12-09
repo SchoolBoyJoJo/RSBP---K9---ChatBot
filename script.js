@@ -2,6 +2,7 @@ const chatDiv = document.getElementById("chat");
 const inputField = document.getElementById("input");
 const sendButton = document.getElementById("button");
 const id = makeid(36);
+let selectedMode = null; // Variabel untuk menyimpan pilihan pengguna
 
 function makeid(length) {
   let result = "";
@@ -15,6 +16,40 @@ function makeid(length) {
   }
   return result;
 }
+
+// Fungsi untuk menampilkan pop-up pilihan mode
+function showModeSelection() {
+  const modePopup = document.createElement("div");
+  modePopup.classList.add("mode-popup");
+
+  const message = document.createElement("p");
+  message.textContent = "Pilih mode chatbot:";
+
+  const genAIButton = document.createElement("button");
+  genAIButton.textContent = "Generative AI";
+  genAIButton.onclick = () => {
+    selectedMode = "genai";
+    document.body.removeChild(modePopup);
+  };
+
+  const pythonModelButton = document.createElement("button");
+  pythonModelButton.textContent = "Model Python";
+  pythonModelButton.onclick = () => {
+    selectedMode = "python";
+    document.body.removeChild(modePopup);
+  };
+
+  modePopup.appendChild(message);
+  modePopup.appendChild(genAIButton);
+  modePopup.appendChild(pythonModelButton);
+
+  document.body.appendChild(modePopup);
+}
+
+// Tampilkan pop-up saat halaman dimuat
+window.onload = () => {
+  showModeSelection();
+};
 
 // Fungsi untuk menambahkan pesan ke chat
 function appendMessage(text, isUser) {
@@ -39,6 +74,11 @@ function appendMessage(text, isUser) {
 
 // Kirim pesan ke server
 sendButton.addEventListener("click", () => {
+  if (!selectedMode) {
+    alert("Silakan pilih mode terlebih dahulu.");
+    return;
+  }
+
   const userMessage = inputField.value.trim();
   if (!userMessage) return;
 
@@ -49,7 +89,7 @@ sendButton.addEventListener("click", () => {
   fetch(`http://127.0.0.1:5000/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: userMessage }),
+    body: JSON.stringify({ message: userMessage, mode: selectedMode }), // Kirim mode bersama pesan
   })
     .then((response) => response.json())
     .then((data) => {

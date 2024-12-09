@@ -70,27 +70,33 @@ chat_dictionary = {}
 @app.route("/<id>", methods=["POST"])
 def chat(id):
     user_input = request.json.get("message", "")
+    mode = request.json.get("mode", "python")  # Default ke model Python
     if not user_input:
         return jsonify({"response": "Please provide a message!"}), 400
 
     if id not in chat_dictionary:
         chat_dictionary[id] = {"history": []}
     client_history = chat_dictionary.get(id)["history"]
-    response = model.get_response(user_input)
-    user_input = f"You are a mental health specialist, you only answer questions about mental health and stress management. {user_input}"
-    if response == "":
-        print("Using Gen AI")
+
+    response = ""
+    if mode == "python":
+        response = model.get_response(user_input)
+    elif mode == "genai":
+        user_input = f"You are a mental health specialist, you only answer questions about mental health and stress management. {user_input}"
         response = (
             generative_ai.start_chat(history=client_history)
             .send_message(user_input)
             .text
         )
-    client_history.append({"role": "user", "parts": user_input})
-    client_history.append({"role": "model", "parts": response})
-    print(client_history)
+    else:
+        return jsonify({"response": "Invalid mode selected!"}), 400
+
+    if mode == "genai":
+        client_history.append({"role": "user", "parts": user_input})
+        client_history.append({"role": "model", "parts": response})
+        print(client_history)
 
     return jsonify({"response": markdown.markdown(response)})
-
 
 if __name__ == "__main__":
     app.run(debug=False)
