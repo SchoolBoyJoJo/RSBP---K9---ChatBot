@@ -2,7 +2,6 @@ const chatDiv = document.getElementById("chat");
 const inputField = document.getElementById("input");
 const sendButton = document.getElementById("button");
 const id = makeid(36);
-let selectedMode = null; // Variabel untuk menyimpan pilihan pengguna
 
 function makeid(length) {
   let result = "";
@@ -16,6 +15,18 @@ function makeid(length) {
   }
   return result;
 }
+
+const selectElement = document.getElementById("model");
+let selectedMode = "python";
+selectElement.addEventListener("change", (event) => {
+  selectedMode = event.target.value;
+  const placeholderOption = selectElement.querySelector("option[value='']");
+  if (placeholderOption) {
+    placeholderOption.remove();
+  }
+
+  console.log("Selected Model:", selectedMode);
+});
 
 // Fungsi untuk menampilkan pop-up pilihan mode
 function showModeSelection() {
@@ -47,9 +58,9 @@ function showModeSelection() {
 }
 
 // Tampilkan pop-up saat halaman dimuat
-window.onload = () => {
-  showModeSelection();
-};
+// window.onload = () => {
+//   showModeSelection();
+// };
 
 // Fungsi untuk menambahkan pesan ke chat
 function appendMessage(text, isUser) {
