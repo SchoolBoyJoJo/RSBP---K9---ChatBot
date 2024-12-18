@@ -75,12 +75,30 @@ def chat(id):
     if mode == "python":
         response = model.get_response(user_input)
     elif mode == "genai":
-        user_input = f"You are a mental health specialist, you only answer questions about mental health and stress management. {user_input}"
-        response = (
-            generative_ai.start_chat(history=client_history)
-            .send_message(user_input)
-            .text
+        response= (
+            generative_ai.start_chat(history=client_history).send_message(user_input).text
         )
+    elif mode == "cm-genai":
+        # greetings = ["hello", "hi", "hey", "greetings", "good day", "good night", "good morning"]
+        # lower_input = user_input.lower()
+        # if any(greet in lower_input for greet in greetings):
+        #     response = f"{user_input.capitalize()}! How can I assist you today?"
+        response_m = model.get_response(user_input)
+        print(response_m)
+        if "Sorry, I don't understand" in response_m:
+            user_input = f"You are a mental health specialist. You only answer questions about mental health and stress management. {user_input}"
+            response = (
+                generative_ai.start_chat(history=client_history)
+                .send_message(user_input)
+                .text
+            )
+        else:
+            user_input = f"You are a mental health specialist. Make this sentence as yours:  {response_m}. Answer with formal atitude and professional language."
+            response = (
+                generative_ai.start_chat(history=client_history)
+                .send_message(user_input)
+                .text
+            )
     else:
         return jsonify({"response": "Invalid mode selected!"}), 400
 
